@@ -1,53 +1,81 @@
-
-
 class Store:
     def __init__(self, products):
-        if products is not None:
-            self.products = products
-        else:
-            self.products = []
+        """
+        Initialize a new store with a list of products.
+
+        :param products: A list of Product objects. If None, initializes with an empty list.
+        """
+        self.products = products if products is not None else []
 
     def add_product(self, product):
+        """
+        Add a product to the store.
+
+        :param product: The Product object to be added.
+        """
         self.products.append(product)
 
-
     def remove_product(self, product):
+        """
+        Remove a product from the store.
+
+        :param product: The Product object to be removed.
+        :raises ValueError: If the product does not exist in the store.
+        """
         if product in self.products:
             self.products.remove(product)
         else:
             raise ValueError("Product does not exist")
 
     def get_total_quantity(self) -> int:
+        """
+        Get the total number of products in the store.
+
+        :return: The total number of products as an integer.
+        """
         return len(self.products)
 
     def get_all_products(self):
-        active_products = []  # Leere Liste für aktive Produkte
+        """
+        Get a list of all active products in the store.
 
-        for product in self.products:  # Schleife über alle Produkte im Store
-            if product.is_active():  # Überprüfen, ob das Produkt aktiv ist
-                active_products.append(product)  # Aktives Produkt zur Liste hinzufügen
+        :return: A list of active Product objects.
+        :raises ValueError: If there are no active products in the store.
+        """
+        active_products = []  # List for active products
 
-        if active_products:  # Überprüfen, ob es aktive Produkte gibt
-            return active_products  # Rückgabe der Liste aktiver Produkte
+        for product in self.products:  # Loop over all products in the store
+            if product.is_active():  # Check if the product is active
+                active_products.append(product)  # Add active product to the list
+
+        if active_products:  # Check if there are any active products
+            return active_products  # Return the list of active products
         else:
             raise ValueError("No active products in the store.")
 
     def order(self, shopping_list) -> float:
-        total_price = 0.0  # Initialisierung des Gesamtpreises
+        """
+        Process an order based on a shopping list.
 
-        for product, quantity in shopping_list:  # Schleife über die Einkaufslisten-Tuples
-            if not product.is_active():  # Überprüfen, ob das Produkt aktiv ist
+        :param shopping_list: A list of tuples where each tuple contains a Product object and its quantity.
+        :return: The total price of the order as a float.
+        :raises ValueError: If any product is not active, quantity is non-positive,
+                           or there is insufficient stock available.
+        """
+        total_price = 0.0  # Initialize total price
+
+        for product, quantity in shopping_list:  # Loop over the shopping list tuples
+            if not product.is_active():  # Check if the product is active
                 raise ValueError(f"Product {product.name} is not active.")
 
-            if quantity <= 0:  # Überprüfen, ob die Menge positiv ist
+            if quantity <= 0:  # Check if quantity is positive
                 raise ValueError("Quantity must be positive.")
 
-            if quantity > product.quantity:  # Überprüfen, ob genügend Lagerbestand vorhanden ist
+            if quantity > product.quantity:  # Check if sufficient stock is available
                 raise ValueError(
                     f"Not enough stock for {product.name}. Available: {product.quantity}, Requested: {quantity}")
 
-            # Berechnung des Preises für das aktuelle Produkt
-            total_price += product.buy(quantity)  # buy() reduziert die Menge im Produkt und gibt den Preis zurück
+            # Calculate price for the current product
+            total_price += product.buy(quantity)  # buy() reduces stock and returns price
 
-        return total_price  # Rückgabe des Gesamtpreises der Bestellung
-
+        return total_price  # Return total price of the order
